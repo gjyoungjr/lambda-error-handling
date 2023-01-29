@@ -1,0 +1,58 @@
+#######################################################
+#             LAMBDA ERROR HANDLING                   #
+#                 Happy Coding!! ;))                  #
+#######################################################
+
+service: lambda-error-handling
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+  stackName: lambda-error-handling-${sls:stage}
+
+# Allow usage of environment variables
+useDotenv: true
+
+## Lambda Function
+functions:
+  Consumer:
+    handler: handler.consumer
+    name: ${self:provider.stackName}-Consumer
+    events:
+      - sqs:
+          arn: !GetAtt SourceQueue.Arn
+
+# CloudFormation resource templates here
+resources:
+  Description: >
+    This stack creates a solution for how to handle Lambda Function errors using Amazon Simple Queue Service (SQS).
+  Resources:
+    # Standard Queue
+    SourceQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stackName}-SourceQueue
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt DLQueue.Arn # Defines where to store failed jobs
+          maxReceiveCount: 1
+    # Dead-Letter Queue
+    DLQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stackName}-DLQueue
+
+  Outputs:
+    SourceQueueURL:
+      Description: "Source Queue URL"
+      Value: !Ref SourceQueue
+      Export:
+        Name: ${self:provider.stackName}-SourceQueue
+    DeadLetterQueueURL:
+      Description: "Dead-Letter Queue URL"
+      Value: !Ref DLQueue
+      Export:
+        Name: ${self:provider.stackName}-DLQueue
