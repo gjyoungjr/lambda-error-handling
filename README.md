@@ -15,13 +15,9 @@ To get a local copy up and running follow the simple steps below.
 
 ### Prerequisites
 
-1. Install the serverless framework CLI via NPM:
+1. Install the [Serverless Framework CLI](https://www.serverless.com/framework/docs/getting-started) via NPM:
   ```bash
   npm install -g serverless
-  ```
-2. Install Amplify CLI via NPM:
-  ```bash
-  npm install -g @aws-amplify/cli
   ```
 
 ### Installation
